@@ -64,7 +64,7 @@ public class JWTUtil {
             /*
             * 1) 분해해서 검색
             * 2) 서명 검증 SecretKey 직접 사용
-            * 3) 파싱 및 검증, 실패시 에허
+            * 3) 파싱 및 검증, 실패시 예외
             */
             return Jwts.parserBuilder()
                     .setSigningKey(key)
