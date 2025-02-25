@@ -1,6 +1,6 @@
 package com.korea.shop.util;
 
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +52,35 @@ public class JWTUtil {
             return jwtStr;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
+        }
+    }
+    
+    /*
+    * 토큰 유효성 검사 메서드
+    * 파싱 : 데이터를 분석하고 분해해서 원하는 형태로 변환하는 과정
+    * 반환형 : Claims로 변경 (JWT 라이브러리는 Claims 객체를 반환함)*/
+    public Map<String, Object> validateToken(String token){
+        try {
+            /*
+            * 1) 분해해서 검색
+            * 2) 서명 검증 SecretKey 직접 사용
+            * 3) 파싱 및 검증, 실패시 에허
+            */
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        }catch (MalformedJwtException e) { // jwt 형식이 올바르지 않음
+            throw new CustomJWTException("MalFored");
+        }catch (ExpiredJwtException e) {
+            throw new CustomJWTException("Expried"); // 토큰 시간이 만료됨
+        }catch (InvalidClaimException e) {
+            throw new CustomJWTException("Invaild"); // 클레임 정보가 올바르지 않음
+        }catch (JwtException e) {
+            throw new CustomJWTException("JWTError"); // 토큰 관련 예러
+        }catch (Exception e) {
+            throw new CustomJWTException("Error"); // 기타 알수 없는 에러
         }
     }
 }
